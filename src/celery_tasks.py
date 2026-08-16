@@ -9,7 +9,7 @@ c_app.config_from_object("src.config")
 
 
 @c_app.task()
-def send_email(
+async def send_email(
     recipients: list[str],
     subject: str,
     body: str
@@ -20,6 +20,6 @@ def send_email(
         body=body
     )
 
-    async_to_sync(mail.send_message)(message)
+    await mail.send_message(message)
 
     print("Email sent")
