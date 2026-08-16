@@ -2,9 +2,6 @@ from fastapi_mail import FastMail, ConnectionConfig, MessageSchema, MessageType
 from src.config import Config
 
 
-
-
-
 mail_config = ConnectionConfig(
     MAIL_USERNAME=Config.MAIL_USERNAME,
     MAIL_PASSWORD=Config.MAIL_PASSWORD,
@@ -28,10 +25,22 @@ def create_message(
     body: str
 ):
     message = MessageSchema(
-        subject=subject,
         recipients=recipients,
+        subject=subject,
         body=body,
-        subtype=MessageType.html,
+        subtype=MessageType.html
     )
-
     return message
+
+
+async def send_email_direct(
+    recipients: list[str],
+    subject: str,
+    body: str
+):
+    message = create_message(
+        recipients=recipients,
+        subject=subject,
+        body=body
+    )
+    await mail.send_message(message)
