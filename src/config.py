@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     USE_CREDENTIALS:bool=True
     VALIDATE_CERTS:bool=True
     DOMAIN:str
+    RESEND_API_KEY: str
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore"

@@ -1,5 +1,6 @@
 from fastapi_mail import FastMail, ConnectionConfig, MessageSchema, MessageType
 from src.config import Config
+import resend
 
 
 mail_config = ConnectionConfig(
@@ -17,7 +18,7 @@ mail_config = ConnectionConfig(
 
 
 mail = FastMail(config=mail_config)
-
+resend.api_key = Config.RESEND_API_KEY
 
 def create_message(
     recipients: list[str],
@@ -38,9 +39,9 @@ async def send_email_direct(
     subject: str,
     body: str
 ):
-    message = create_message(
-        recipients=recipients,
-        subject=subject,
-        body=body
-    )
-    await mail.send_message(message)
+   resend.Emails.send({
+        "from": "Bookly <onboarding@resend.dev>",
+        "to": recipients,
+        "subject": subject,
+        "html": body,
+    })
