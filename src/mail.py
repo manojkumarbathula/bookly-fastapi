@@ -3,7 +3,6 @@ from src.config import Config
 from pathlib import Path
 
 
-BASE_DIR = Path(__file__).resolve().parent
 
 
 mail_config = ConnectionConfig(
