@@ -45,7 +45,7 @@ def upgrade() -> None:
     sa.Column('updated_at', postgresql.TIMESTAMP(), nullable=True),
     sa.PrimaryKeyConstraint('uid')
     )
-    op.drop_table('Books')
+    #op.drop_table('Books')
     # ### end Alembic commands ###
 
 

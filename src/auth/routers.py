@@ -49,7 +49,7 @@ from src.errors import (
 )
 
 from src.config import Config
-from src.celery_tasks import send_email
+from src.mail import mail, create_message
 
 # Rate limiter
 from src.rate_limit import limiter
@@ -78,7 +78,8 @@ REFRESH_TOKEN_EXPIRY = 2
 @limiter.limit("5/minute")
 async def send_mail(
     request: Request,
-    emails: EmailModel
+    emails: EmailModel,
+    bg_tasks: BackgroundTasks
 ):
 
     emails = emails.addresses
@@ -86,10 +87,15 @@ async def send_mail(
     html = "<h1>Welcome to the app</h1>"
     subject = "Welcome to the app"
 
-    send_email.delay(
-        emails,
-        subject,
-        html
+    message = create_message(
+        recipients=emails,
+        subject=subject,
+        body=html
+    )
+
+    bg_tasks.add_task(
+        mail.send_message,
+        message
     )
 
     return {
@@ -161,10 +167,15 @@ async def create_user_Account(
 
     subject = "Verify Your email"
 
-    send_email.delay(
-        emails,
-        subject,
-        html_message
+    message = create_message(
+    recipients=emails,
+    subject=subject,
+    body=html_message
+    )
+
+    bg_tasks.add_task(
+        mail.send_message,
+        message
     )
 
     return {
@@ -429,7 +440,8 @@ async def revoke_token(
 @limiter.limit("3/minute")
 async def password_reset_request(
     request: Request,
-    email_data: PasswordResetRequestModel
+    email_data: PasswordResetRequestModel,
+    bg_tasks: BackgroundTasks
 ):
 
     email = email_data.email
@@ -455,12 +467,17 @@ async def password_reset_request(
 
     subject = "Reset Your Password"
 
-    send_email.delay(
-        [email],
-        subject,
-        html_message
+    message = create_message(
+    recipients=[email],
+    subject=subject,
+    body=html_message
     )
 
+    bg_tasks.add_task(
+        mail.send_message,
+        message
+    )
+    
     return JSONResponse(
         content={
             "message": (
