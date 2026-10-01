@@ -49,6 +49,8 @@ async def update_book(book_uid: str, book_update_data: BookUpdateModel,session:A
         return updated_book
     else:
         raise BookNotFound()
+    
+@book_router.delete("/{book_uid}",dependencies=[role_checker]) 
 async def delete_book(book_uid: str,session:AsyncSession=Depends(get_session),token_details: dict =Depends(access_token_bearer)):
     book_to_delete=await book_service.delete_book(book_uid,session)
     
